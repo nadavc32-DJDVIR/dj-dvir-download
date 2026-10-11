@@ -50,6 +50,15 @@ h1 .grad{background:linear-gradient(90deg,#18e0ff,#8a5bff);-webkit-background-cl
 .dl .os{font-size:26px}.dl small{display:block;font-size:12px;font-weight:500;opacity:.85}
 .dl.alt{background:#111f3e;border:1px solid var(--line);box-shadow:none;color:#dfe7ff}
 .trust{margin-top:14px;color:#6f82ad;font-size:13px}
+.macbox{max-width:620px;margin:18px auto 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;text-align:right}
+.macbox .mb-h{font-weight:900;color:var(--ok);font-size:16px;margin-bottom:8px}
+.macbox .mb-s{color:var(--ink);font-size:14px;line-height:1.6;margin-bottom:10px}
+.macbox .mb-cmd{display:flex;align-items:stretch;gap:8px;background:#06112b;border:1px solid var(--line);border-radius:12px;padding:10px 12px;direction:ltr}
+.macbox .mb-cmd code{flex:1;color:#cfe0ff;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;white-space:nowrap;overflow-x:auto;align-self:center}
+.macbox .mb-copy{flex-shrink:0;border:0;border-radius:9px;background:var(--acc);color:#04121e;font-weight:800;font-size:13px;padding:0 14px;cursor:pointer}
+.macbox .mb-why{color:var(--mut);font-size:12.5px;line-height:1.55;margin-top:10px}
+.macbox .mb-alt{color:var(--mut);font-size:12.5px;margin-top:8px}
+.macbox .mb-alt a{color:var(--acc);font-weight:700}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:46px 0 10px}
 @media(max-width:720px){.steps{grid-template-columns:1fr}}
 .step{background:linear-gradient(180deg,rgba(26,42,86,.5),rgba(12,22,48,.7));border:1px solid var(--line);border-radius:16px;padding:20px}
@@ -169,6 +178,7 @@ footer{margin-top:48px;text-align:center;color:#5f719c;font-size:12.5px;padding-
     <div class="sec-t" style="margin-top:0">מוכנים להתחיל?</div>
     <p class="sec-s">הורדה חינם, הרשמה בפתיחה הראשונה.</p>
     <div class="dlrow" id="dlrow2"></div>
+    <div id="macpanel"></div>
   </section>
 
   <section id="how">
@@ -220,10 +230,30 @@ function detectOS(){
 function btn(os, info, primary){
   const label = os === 'win' ? 'Windows' : 'Mac';
   const ico = os === 'win' ? '🪟' : '';
-  return `<a class="dl ${primary ? '' : 'alt'}" href="${info.url}" data-os="${os}">
+  // Mac: open the clean terminal-install panel instead of a direct .dmg (avoids the Gatekeeper warning).
+  const click = os === 'mac' ? ' onclick="return showMacInstall(event)"' : '';
+  return `<a class="dl ${primary ? '' : 'alt'}" href="${info.url}" data-os="${os}"${click}>
     <span class="os">${ico}</span><span>הורדה ל-${label}<small>גרסה ${info.version}</small></span></a>`;
 }
+let LINKS = null;
+function showMacInstall(e){
+  if (e) e.preventDefault();
+  const p = document.getElementById('macpanel'); if (!p) return false;
+  const info = (LINKS && LINKS.mac) || CFG.fallback.mac;
+  const cmd = 'curl -fsSL ' + location.origin + '/install-mac.sh | bash';
+  p.innerHTML = `<div class="macbox">
+    <div class="mb-h">✅ התקנה נקייה ל-Mac - בלי אזהרות</div>
+    <div class="mb-s">פתחו <b>Terminal</b> (⌘+רווח ← הקלידו ״Terminal״ ← Enter), הדביקו את השורה והקישו Enter:</div>
+    <div class="mb-cmd"><code id="miCmd">${cmd}</code><button class="mb-copy" type="button" onclick="miCopy()">העתק</button></div>
+    <div class="mb-why">כך מותקנות תוכנות כמו Homebrew - ההורדה דרך הטרמינל לא מסומנת ע״י macOS, והאפליקציה נפתחת רגיל.</div>
+    <div class="mb-alt">מעדיפים קובץ? <a href="${info.url}">הורדת ‏.dmg רגיל</a> - ואז: System Settings ← Privacy &amp; Security ← ״Open Anyway״.</div>
+  </div>`;
+  try { p.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) {}
+  return false;
+}
+function miCopy(){ try { navigator.clipboard.writeText(document.getElementById('miCmd').textContent); const b = document.querySelector('.mb-copy'); if (b){ b.textContent = 'הועתק ✓'; setTimeout(() => b.textContent = 'העתק', 1600); } } catch (_) {} }
 function render(links){
+  LINKS = links;
   const os = detectOS();
   const ver = document.getElementById('ver');
   if (os === 'ios' || os === 'android'){   // phones/tablets: the system is a desktop app - don't claim "Mac"
