@@ -228,12 +228,15 @@ function detectOS(){
   return 'win';
 }
 function btn(os, info, primary){
+  const isMac = os === 'mac';
   const label = os === 'win' ? 'Windows' : 'Mac';
-  const ico = os === 'win' ? '🪟' : '';
-  // Mac: open the clean terminal-install panel instead of a direct .dmg (avoids the Gatekeeper warning).
-  const click = os === 'mac' ? ' onclick="return showMacInstall(event)"' : '';
+  const ico = os === 'win' ? '🪟' : '🍎';
+  // Mac opens the clean one-command install panel (no .dmg download → no Gatekeeper warning); Windows stays a file download.
+  const click = isMac ? ' onclick="return showMacInstall(event)"' : '';
+  const title = isMac ? 'הַתְקָנָה יְשִׁירָה ל-Mac' : 'הורדה ל-' + label;
+  const sub = isMac ? '(via Terminal)' : 'גרסה ' + info.version;
   return `<a class="dl ${primary ? '' : 'alt'}" href="${info.url}" data-os="${os}"${click}>
-    <span class="os">${ico}</span><span>הורדה ל-${label}<small>גרסה ${info.version}</small></span></a>`;
+    <span class="os">${ico}</span><span>${title}<small>${sub}</small></span></a>`;
 }
 let LINKS = null;
 function showMacInstall(e){
@@ -242,11 +245,11 @@ function showMacInstall(e){
   const info = (LINKS && LINKS.mac) || CFG.fallback.mac;
   const cmd = 'curl -fsSL ' + location.origin + '/install-mac.sh | bash';
   p.innerHTML = `<div class="macbox">
-    <div class="mb-h">✅ התקנה נקייה ל-Mac - בלי אזהרות</div>
+    <div class="mb-h">🍎 התקנה ישירה ל-Mac</div>
     <div class="mb-s">פתחו <b>Terminal</b> (⌘+רווח ← הקלידו ״Terminal״ ← Enter), הדביקו את השורה והקישו Enter:</div>
     <div class="mb-cmd"><code id="miCmd">${cmd}</code><button class="mb-copy" type="button" onclick="miCopy()">העתק</button></div>
-    <div class="mb-why">כך מותקנות תוכנות כמו Homebrew - ההורדה דרך הטרמינל לא מסומנת ע״י macOS, והאפליקציה נפתחת רגיל.</div>
-    <div class="mb-alt">מעדיפים קובץ? <a href="${info.url}">הורדת ‏.dmg רגיל</a> - ואז: System Settings ← Privacy &amp; Security ← ״Open Anyway״.</div>
+    <div class="mb-why">זו דרך-ההתקנה המומלצת - בדיוק כמו תוכנות רבות ל-Mac (למשל Homebrew). היא מתקינה את DJ Dvir ופותחת אותה.</div>
+    <div class="mb-alt">מעדיפים קובץ? <a href="${info.url}">הורדת ‏.dmg רגיל</a>.</div>
   </div>`;
   try { p.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) {}
   return false;
