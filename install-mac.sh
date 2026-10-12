@@ -4,7 +4,7 @@
 # (לא דרך הדפדפן), הקובץ לא מקבל סימן-"הורדה" של macOS - ולכן האפליקציה נפתחת רגיל,
 # בלי אזהרת-אבטחה. זו אותה דרך שבה מותקנות תוכנות כמו Homebrew.
 #
-# שימוש:  curl -fsSL https://dj-dvir-download.onrender.com/install-mac.sh | bash
+# שימוש:  curl -fsSL https://djdvir.onrender.com/install-mac.sh | bash
 set -e
 
 APP="DJ Dvir"

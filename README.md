@@ -13,7 +13,7 @@ cd download-site && python3 -m http.server 8080   # ואז http://localhost:8080
 1. דוחפים את התיקייה הזו לריפו ב-GitHub (ראו למטה).
 2. נכנסים ל-[render.com](https://render.com) → **New** → **Static Site** → מחברים את הריפו.
 3. Render קורא את `render.yaml` — **בלי build, בלי עלות**.
-4. מקבלים דומיין חינמי: `https://dj-dvir-download.onrender.com` (או השם שתבחרו).
+4. מקבלים דומיין חינמי: `https://djdvir.onrender.com` (או השם שתבחרו).
    - דומיין משלכם (אופציונלי): Settings → Custom Domain.
 
 חלופה חינמית נוספת: **GitHub Pages** (Settings → Pages → Deploy from branch → root).
