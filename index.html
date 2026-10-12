@@ -211,8 +211,8 @@ const CFG = {
   DEMO_API: 'https://dj-dvir-demo-api.onrender.com',   // the live AI-demo API (Render web service running the existing engine)
   HUB: '',   // e.g. 'https://dj-dvir-hub.onrender.com' - leave '' to use only the fallbacks below
   fallback: {
-    mac: { url: 'https://github.com/Nadav-art/dj-dvir-download/releases/latest/download/DJ-Dvir-mac.dmg', version: '2.2.2' },
-    win: { url: 'https://github.com/Nadav-art/dj-dvir-download/releases/latest/download/DJ-Dvir-win.exe', version: '2.2.2' },
+    mac: { url: 'https://github.com/nadavc32-DJDVIR/dj-dvir-download/releases/latest/download/DJ-Dvir-mac.dmg', version: '2.2.4' },
+    win: { url: 'https://github.com/nadavc32-DJDVIR/dj-dvir-download/releases/latest/download/DJ-Dvir-win.exe', version: '2.2.4' },
   },
 };
 document.getElementById('yr').textContent = new Date().getFullYear();
@@ -459,7 +459,7 @@ async function load(){
   // ALWAYS reflect the latest version straight from the repo's GitHub Releases - so a silent version bump
   // (a new Release) shows here automatically, with no manual edit to this site.
   try {
-    const r = await fetch('https://api.github.com/repos/Nadav-art/dj-dvir-download/releases/latest', { cache: 'no-store' });
+    const r = await fetch('https://api.github.com/repos/nadavc32-DJDVIR/dj-dvir-download/releases/latest', { cache: 'no-store' });
     if (r.ok) {
       const rel = await r.json();
       const ver = (rel.tag_name || '').replace(/^v/, '') || null;

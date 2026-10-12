@@ -8,7 +8,7 @@
 set -e
 
 APP="DJ Dvir"
-DMG_URL="https://github.com/Nadav-art/dj-dvir-download/releases/latest/download/DJ-Dvir-mac.dmg"
+DMG_URL="https://github.com/nadavc32-DJDVIR/dj-dvir-download/releases/latest/download/DJ-Dvir-mac.dmg"
 TMP="$(mktemp -d)"
 DMG="$TMP/DJ-Dvir.dmg"
 MNT="$TMP/mnt"
