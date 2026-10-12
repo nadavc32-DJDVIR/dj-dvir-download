@@ -49,6 +49,7 @@ h1 .grad{background:linear-gradient(90deg,#18e0ff,#8a5bff);-webkit-background-cl
 .dl:hover{filter:brightness(1.08)}.dl:active{transform:translateY(1px)}
 .dl .os{font-size:26px}.dl small{display:block;font-size:12px;font-weight:500;opacity:.85}
 .dl.alt{background:#111f3e;border:1px solid var(--line);box-shadow:none;color:#dfe7ff}
+.dl.soon{opacity:.62;border-style:dashed}.dl.soon:hover{filter:none}
 .trust{margin-top:14px;color:#6f82ad;font-size:13px}
 .macbox{max-width:620px;margin:18px auto 0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;text-align:right}
 .macbox .mb-h{font-weight:900;color:var(--ok);font-size:16px;margin-bottom:8px}
@@ -231,25 +232,25 @@ function btn(os, info, primary){
   const isMac = os === 'mac';
   const label = os === 'win' ? 'Windows' : 'Mac';
   const ico = os === 'win' ? '🪟' : '🍎';
-  // Mac opens the clean one-command install panel (no .dmg download → no Gatekeeper warning); Windows stays a file download.
-  const click = isMac ? ' onclick="return showMacInstall(event)"' : '';
-  const title = isMac ? 'הַתְקָנָה יְשִׁירָה ל-Mac' : 'הורדה ל-' + label;
-  const sub = isMac ? '(via Terminal)' : 'גרסה ' + info.version;
-  return `<a class="dl ${primary ? '' : 'alt'}" href="${info.url}" data-os="${os}"${click}>
+  // Mac desktop download is paused (macOS blocks the unsigned app). Mac users get the web version instead;
+  // the button explains this. Windows stays a normal file download.
+  if (isMac){
+    return `<a class="dl alt soon" href="#" data-os="mac" onclick="return showMacInfo(event)">
+      <span class="os">🍎</span><span>ל-Mac — בקרוב<small>בינתיים: גרסת ווב</small></span></a>`;
+  }
+  const title = 'הורדה ל-' + label;
+  const sub = 'גרסה ' + info.version;
+  return `<a class="dl ${primary ? '' : 'alt'}" href="${info.url}" data-os="${os}">
     <span class="os">${ico}</span><span>${title}<small>${sub}</small></span></a>`;
 }
 let LINKS = null;
-function showMacInstall(e){
+function showMacInfo(e){
   if (e) e.preventDefault();
   const p = document.getElementById('macpanel'); if (!p) return false;
-  const info = (LINKS && LINKS.mac) || CFG.fallback.mac;
-  const cmd = 'curl -fsSL ' + location.origin + '/install-mac.sh | bash';
   p.innerHTML = `<div class="macbox">
-    <div class="mb-h">🍎 התקנה ישירה ל-Mac</div>
-    <div class="mb-s">פתחו <b>Terminal</b> (⌘+רווח ← הקלידו ״Terminal״ ← Enter), הדביקו את השורה והקישו Enter:</div>
-    <div class="mb-cmd"><code id="miCmd">${cmd}</code><button class="mb-copy" type="button" onclick="miCopy()">העתק</button></div>
-    <div class="mb-why">זו דרך-ההתקנה המומלצת - בדיוק כמו תוכנות רבות ל-Mac (למשל Homebrew). היא מתקינה את DJ Dvir ופותחת אותה.</div>
-    <div class="mb-alt">מעדיפים קובץ? <a href="${info.url}">הורדת ‏.dmg רגיל</a>.</div>
+    <div class="mb-h">🍎 גרסת Mac — בקרוב</div>
+    <div class="mb-s">גרסת ההתקנה ל-Mac אינה זמינה כרגע. בקרוב תהיה למשתמשי Mac <b>גרסת ווב</b> — שימוש ישירות בדפדפן, בלי התקנה.</div>
+    <div class="mb-why">בינתיים, הגרסה המלאה זמינה ל-<b>Windows</b> (הורדה והתקנה רגילה). נעדכן כאן כשגרסת-הווב ל-Mac תעלה.</div>
   </div>`;
   try { p.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) {}
   return false;
@@ -268,11 +269,19 @@ function render(links){
     if (ver) ver.textContent = '';   // no repeated "זוהה אייפון" line - the message above says it once
     return;
   }
-  const other = os === 'win' ? 'mac' : 'win';
-  const html = btn(os, links[os], true) + btn(other, links[other], false);
+  if (os === 'mac'){   // Mac desktop download paused — lead with the web-version note, still offer Windows
+    const html = btn('mac', links.mac, false) + btn('win', links.win, false);
+    document.getElementById('dlrow').innerHTML =
+      `<span class="trust" style="display:block;margin-bottom:10px">🍎 זוהה Mac — גרסת <b>ווב</b> בקרוב (בלי התקנה). בינתיים הגרסה המלאה זמינה ל-<b>Windows</b>.</span>${html}`;
+    document.getElementById('dlrow2').innerHTML = html;
+    if (ver) ver.textContent = '';
+    return;
+  }
+  const other = 'mac';
+  const html = btn('win', links.win, true) + btn(other, links[other], false);
   document.getElementById('dlrow').innerHTML = html;
   document.getElementById('dlrow2').innerHTML = html;
-  if (ver) ver.textContent = '✓ זוהה: ' + (os === 'win' ? 'Windows' : 'Mac') + ' · גרסה ' + links[os].version;
+  if (ver) ver.textContent = '✓ זוהה: Windows · גרסה ' + links.win.version;
 }
 // ---- feature "peek" popups: let people FEEL each room before downloading ----
 const wave = n => Array.from({ length: n }, (_, i) => `<i style="animation-delay:${(i * 0.07).toFixed(2)}s"></i>`).join('');
